@@ -56,6 +56,9 @@ var initDb = function(callback) {
   });
 };
 
+var isUrl = require('url_validator')
+var getPixels = require('get-pixels')
+
 app.get('/', function (req, res) {
     res.render('index.html');
 });
@@ -64,12 +67,29 @@ app.get('/ping', function (req, res) {
     res.send('pong');
 });
 
-app.get('/pixelTransfer/data?', function (req, res) {
-  if (req.query.url) {
-    res.send(req.query.url)
+
+app.get('/pixelTransfer/', function (req, res) {
+  if (!req.params.data) {
+    res.send('Query = {"data" = {"url"}}')
+  };
+});
+
+app.get('/pixelTransfer/data?', function(req, res){
+  console.log(req.query)
+  var url = req.url
+  if (url) {
+    if (isUrl(url)) {
+      res.send(getPixels(url, function(err, pixels) {
+        if (err) {
+          res.json({error: true})
+        };
+      }));
+      //res.json({ querystring_breed: req.query.breed });
+    };
   } else {
+    if (url) {}
     res.send('No url received.')
-  }
+  };
 });
 
 // error handling
