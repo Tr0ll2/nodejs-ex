@@ -56,7 +56,7 @@ var initDb = function(callback) {
   });
 };
 
-var isUrl = require('url_validator')
+var isUrl = require('is-url')
 var getPixels = require('get-pixels')
 
 app.get('/', function (req, res) {
@@ -75,19 +75,24 @@ app.get('/pixelTransfer/', function (req, res) {
 });
 
 app.get('/pixelTransfer/data?', function(req, res){
-  console.log(req.query)
-  var url = req.url
+  var url = req.query.url
   if (url) {
-    if (isUrl(url)) {
-      res.send(getPixels(url, function(err, pixels) {
+    if (url.match(/(http\:|https\:).+[.](gif|png|jpg|jpeg)/)) {
+      console.log('url is real')
+      console.log(url)
+      getPixels(url, function(err, pixels) {
         if (err) {
-          res.json({error: true})
-        };
-      }));
-      //res.json({ querystring_breed: req.query.breed });
-    };
+          console.log(err)
+          return
+        } else {
+          res.json(pixels)
+        }
+      });
+    } else {
+      console.log('url is fake')
+      res.send('Url is considered to be fake.')
+    }
   } else {
-    if (url) {}
     res.send('No url received.')
   };
 });
