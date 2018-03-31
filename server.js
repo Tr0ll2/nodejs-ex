@@ -56,7 +56,6 @@ var initDb = function(callback) {
   });
 };
 
-var isUrl = require('is-url')
 var getPixels = require('get-pixels')
 
 app.get('/', function (req, res) {
