@@ -76,7 +76,7 @@ app.get('/pixelTransfer/', function (req, res) {
 app.get('/pixelTransfer/data?', function(req, res){
   var url = req.query.url
   if (url) {
-    if (url.match(/(http\:|https\:).+[.](gif|png|jpg|jpeg)/)) {
+    if (url.match(/^(http\:|https\:).+[.](gif|png|jpg|jpeg)$/)) {
       console.log('url is real')
       console.log(url)
       getPixels(url, function(err, pixels) {
@@ -84,14 +84,32 @@ app.get('/pixelTransfer/data?', function(req, res){
           console.log(err)
           return
         } else {
-          res.json(pixels)
+          var array = [];
+          var animated = (pixels.shape.length === 4);
+          var width = pixels.shape[(animated ? 1 : 0)];
+          var height = pixels.shape[(animated ? 2 : 1)];
+          for(var y = 0;y < height;y++){
+              var row = [];
+              for(var x = 0;x < width;x++){
+                  var r = pixels.get(x,y,0);
+                  var g = pixels.get(x,y,1);
+                  var b = pixels.get(x,y,2);
+                  var a = 127 - (pixels.get(x,y,3)*(127/255));
+                  var pixel = [r,g,b,a];
+                  row.push(pixel);
+              }
+              array.push(row);
+          }
+          var json = JSON.stringify(array);
+          res.send(json);
         }
       });
     } else {
       console.log('url is fake')
+      console.log(url)
       res.send('Url is considered to be fake.')
     }
-  } else {
+  } else {2
     res.send('No url received.')
   };
 });
