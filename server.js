@@ -95,7 +95,12 @@ app.get('/pixelTransfer/data?', function(req, res){
 								var g = pixels.get(x,y,1);
 								var b = pixels.get(x,y,2);
 								var a = 127 - (pixels.get(x,y,3)*(127/255));
-								var pixel = [r,g,b,a];
+								var pixel;
+								if(z > 0 && r === 0 && g === 0 && b === 0 && a === 127){
+								    pixel = array[z - 1][y][x];
+								}else{
+								    pixel = [r,g,b,a];
+								}
 								row.push(pixel);
 							}
 							array.push(row);
@@ -113,7 +118,12 @@ app.get('/pixelTransfer/data?', function(req, res){
 									var g = pixels.get(z,x,y,1);
 									var b = pixels.get(z,x,y,2);
 									var a = 127 - (pixels.get(z,x,y,3)*(127/255));
-									var pixel = [r,g,b,a];
+									var pixel;
+									if(z > 0 && r === 0 && g === 0 && b === 0 && a === 127){
+									    pixel = array[z - 1][y][x];
+									}else{
+									    pixel = [r,g,b,a];
+									}
 									row.push(pixel);
 								}
 								frame.push(row);
