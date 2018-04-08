@@ -79,13 +79,13 @@ app.get('/pixelTransfer/data?', function(req, res){
 		if (url.match(/^(http\:|https\:).+[.](gif|png|jpg|jpeg)$/)) {
 			console.log('url is real')
 			console.log(url)
-			getPixels(url, function(err, pixels) {
+			getPixels(url, function(err, pixels, reader) {
 				if (err) {
 					console.log(err)
 					return
 				} else {
 					var array = [];
-					if(pixels.shape.length === 3){
+					if(pixels.shape.length < 4){
 						var width = pixels.shape[0];
 						var height = pixels.shape[1];
 						for(var y = 0;y < height;y++){
@@ -118,6 +118,7 @@ app.get('/pixelTransfer/data?', function(req, res){
 								}
 								frame.push(row);
 							}
+							frame.push(reader.frameInfo(z).delay*10); //Times 10 because GIF protocols specify delay in terms of 100ths of a second, not milliseconds (which are 1000ths)
 							array.push(frame);
 						}
 					}
