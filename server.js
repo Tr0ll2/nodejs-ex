@@ -95,12 +95,7 @@ app.get('/pixelTransfer/data?', function(req, res){
 								var g = pixels.get(x,y,1);
 								var b = pixels.get(x,y,2);
 								var a = 127 - (pixels.get(x,y,3)*(127/255));
-								var pixel;
-								if(z > 0 && r === 0 && g === 0 && b === 0 && a === 127){
-								    pixel = array[z - 1][y][x];
-								}else{
-								    pixel = [r,g,b,a];
-								}
+								var pixel = [r,g,b,a];
 								row.push(pixel);
 							}
 							array.push(row);
@@ -109,26 +104,37 @@ app.get('/pixelTransfer/data?', function(req, res){
 						var frames = pixels.shape[0];
 						var width = pixels.shape[1];
 						var height = pixels.shape[2];
+            var state = [];
 						for(var z = 0;z < frames;z++){
 							var frame = [];
+              var frameInfo = reader.frameInfo(z);
+              var dispose = frameInfo.dispose;
 							for(var y = 0;y < height;y++){
+                state[y] = state[y] || [];
 								var row = [];
 								for(var x = 0;x < width;x++){
+                  state[y][x] = state[y][x] || [0,0,0,127];
 									var r = pixels.get(z,x,y,0);
 									var g = pixels.get(z,x,y,1);
 									var b = pixels.get(z,x,y,2);
 									var a = 127 - (pixels.get(z,x,y,3)*(127/255));
 									var pixel;
-									if(z > 0 && r === 0 && g === 0 && b === 0 && a === 127){
-									    pixel = array[z - 1][y][x];
+                  var empty = a === 127 && dispose !== 0; //Dispose 0 (No Action Specified) means just render the frame and ignore everything else
+									if(empty){
+										pixel = state[y][x].slice();
 									}else{
-									    pixel = [r,g,b,a];
+										pixel = [r,g,b,a];
 									}
 									row.push(pixel);
+                  if(dispose === 1 && empty){ //Dispose 1 (Do Not Dispose) means save the frame to the state
+                    state[y][x] = pixel.slice();
+                  }else if(dispose === 2){ //Dispose 2 (Dispose To Background) means nuke the state
+                    state[y][x] = [0,0,0,127];
+                  } //Dispose 3 (Dispose to Previous) means do not save the frame to the state, so no changes to the state are needed
 								}
 								frame.push(row);
 							}
-							frame.push(reader.frameInfo(z).delay*10); //Times 10 because GIF protocols specify delay in terms of 100ths of a second, not milliseconds (which are 1000ths)
+							frame.push(frameInfo.delay*10); //Times 10 because GIF protocols specify delay in terms of 100ths of a second, not milliseconds (which are 1000ths)
 							array.push(frame);
 						}
 					}
