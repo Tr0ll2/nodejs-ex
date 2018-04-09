@@ -108,7 +108,7 @@ app.get('/pixelTransfer/data?', function(req, res){
 						for(var z = 0;z < frames;z++){
 							var frame = [];
               var frameInfo = reader.frameInfo(z);
-              var dispose = frameInfo.dispose;
+              var dispose = frameInfo.disposal;
 							for(var y = 0;y < height;y++){
                 state[y] = state[y] || [];
 								var row = [];
@@ -126,11 +126,11 @@ app.get('/pixelTransfer/data?', function(req, res){
 										pixel = [r,g,b,a];
 									}
 									row.push(pixel);
-                  if(dispose <= 1 && !empty){ //Dispose 0 (Unspecified) and Dispose 1 (Do Not Dispose) means save the frame to the state
+                  if(dispose <= 1 && !empty){ //Dispose 0 (Unspecified) and Dispose 1 (Do Not Dispose) mean save the frame to the state
                     state[y][x] = pixel.slice();
-                  }else if(dispose === 2){ //Dispose 2 (Dispose To Background) means nuke the state
+                  }else if(dispose === 2){ //Dispose 2 (Restore To Background) means nuke the state
                     state[y][x] = [0,0,0,127];
-                  } //Dispose 3 (Dispose to Previous) means do not save the frame to the state, so no changes to the state are needed
+                  } //Dispose 3 (Restore to Previous) means do not save the frame to the state, so no changes to the state are needed
 								}
 								frame.push(row);
 							}
