@@ -119,14 +119,14 @@ app.get('/pixelTransfer/data?', function(req, res){
 									var b = pixels.get(z,x,y,2);
 									var a = 127 - (pixels.get(z,x,y,3)*(127/255));
 									var pixel;
-                  var empty = a === 127 && dispose !== 0; //Dispose 0 (No Action Specified) means just render the frame and ignore everything else
+                  var empty = a === 127;
 									if(empty){
 										pixel = state[y][x].slice();
 									}else{
 										pixel = [r,g,b,a];
 									}
 									row.push(pixel);
-                  if(dispose === 1 && !empty){ //Dispose 1 (Do Not Dispose) means save the frame to the state
+                  if(dispose <= 1 && !empty){ //Dispose 0 (Unspecified) and Dispose 1 (Do Not Dispose) means save the frame to the state
                     state[y][x] = pixel.slice();
                   }else if(dispose === 2){ //Dispose 2 (Dispose To Background) means nuke the state
                     state[y][x] = [0,0,0,127];
