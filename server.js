@@ -85,22 +85,23 @@ app.get('/pixelTransfer/data?', function(req, res){
 					return
 				} else {
 					var array = [];
-					var width = pixels.shape[0];
-					var height = pixels.shape[1];
-					var frame = [];
-					for(var y = 0;y < height;y++){
-						var row = [];
-						for(var x = 0;x < width;x++){
-							var r = pixels.get(x,y,0);
-							var g = pixels.get(x,y,1);
-							var b = pixels.get(x,y,2);
-							var a = 127 - (pixels.get(x,y,3)*(127/255));
-							var pixel = [r,g,b,a];
-							row.push(pixel);
+					if(pixels.shape.length < 4){
+						var width = pixels.shape[0];
+						var height = pixels.shape[1];
+            var frame = [];
+						for(var y = 0;y < height;y++){
+							var row = [];
+							for(var x = 0;x < width;x++){
+								var r = pixels.get(x,y,0);
+								var g = pixels.get(x,y,1);
+								var b = pixels.get(x,y,2);
+								var a = 127 - (pixels.get(x,y,3)*(127/255));
+								var pixel = [r,g,b,a];
+								row.push(pixel);
+							}
+							frame.push(row);
 						}
-						frame.push(row);
-					}
-					array.push(frame)
+            array.push(frame)
 					}else{
 						var frames = pixels.shape[0];
 						var width = pixels.shape[1];
