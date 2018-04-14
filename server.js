@@ -97,8 +97,7 @@ app.get('/pixelTransfer/data?', function(req, res){
 								var pixel = [r,g,b,a];
 								row.push(pixel);
 							}
-              frame.push(row);
-							array.push(frame);
+							array.push(row);
 						}
 					}else{
 						var frames = pixels.shape[0];
